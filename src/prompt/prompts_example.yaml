@@ -30,7 +30,6 @@ prompts:
 
       사용자 입력:
       {user_input}
-\src\prompt\prompts_example.yaml
 
 prompts:
   - name: rag_qa
