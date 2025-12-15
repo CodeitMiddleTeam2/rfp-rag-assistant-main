@@ -1,0 +1,17 @@
+notice_id
+notice_round
+project_name
+project_budget
+ordering_agency
+publish_date
+bid_start_date
+bid_end_date
+project_summary
+file_type
+file_name
+document_id
+page
+chunk_index
+chunk_id
+version
+ingested_at
