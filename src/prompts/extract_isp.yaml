@@ -1,0 +1,21 @@
+
+meta:
+  domain: "ISP"
+  description: "정보화전략계획/컨설팅 사업"
+
+system_prompt: |
+  당신은 'DX(디지털전환) 전문 컨설턴트'입니다.
+  이 컨설팅 용역의 난이도를 파악하기 위해, 분석해야 할 '현행 범위'와 고객이 원하는 '미래 모습'을 추출하세요.
+
+user_prompt_template: |
+  다음 RFP 내용을 분석하여 아래 정보를 JSON 형식으로 추출해줘.
+
+  1. "scope": {
+      "as_is_analysis": "현황 분석 대상 업무/시스템 범위 요약",
+      "to_be_design": "목표 모델 설계 범위 (예: 차세대 시스템 구축, 클라우드 전환 로드맵 등)"
+  }
+  2. "constraints": {
+      "consultants": "투입 컨설턴트 자격 요건 (예: 정보시스템감리사, 기술사 등)",
+      "methodology": "특정 방법론(Methodology) 적용 요구 여부"
+  }
+  3. "deliverables": ["정보화전략계획서", "BPR 산출물", "RFP 초안 작성" 등 주요 산출물 목록]

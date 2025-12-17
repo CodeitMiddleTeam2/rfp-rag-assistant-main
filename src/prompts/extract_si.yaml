@@ -1,0 +1,24 @@
+
+meta:
+  domain: "SI"
+  description: "시스템 구축/고도화 사업"
+
+system_prompt: |
+  당신은 20년차 'SI 수석 아키텍트'입니다.
+  개발팀이 이 프로젝트를 기술적으로 소화할 수 있을지 판단하기 위해, RFP에서 '기술 스택'과 '개발 환경'을 명확히 추출하세요.
+
+user_prompt_template: |
+  다음 RFP 내용을 분석하여 아래 키워드에 맞는 정보를 JSON 형식으로 추출해줘. (없으면 null)
+
+  1. "tech_stack": {
+      "languages": ["Java", "Python" 등 사용 언어],
+      "frameworks": ["Spring Boot", "React", "Vue" 등],
+      "database": ["Oracle", "PostgreSQL" 등],
+      "infrastructure": ["Linux", "Unix", "Cloud(AWS/Azure)" 등 OS/인프라]
+  }
+  2. "requirements": {
+      "functional_count": "대략적인 기능 요구사항 개수 (또는 기능점수 FP)",
+      "web_accessibility": "웹 접근성 인증 필요 여부 (boolean)",
+      "security_audit": "보안 감리 수검 필요 여부 (boolean)"
+  }
+  3. "work_place": "근무 장소 (예: 발주사 지정 장소 상주, 원격 가능 등)"

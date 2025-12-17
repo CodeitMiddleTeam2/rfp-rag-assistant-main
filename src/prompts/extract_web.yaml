@@ -1,0 +1,18 @@
+
+meta:
+  domain: "Web"
+  description: "홈페이지/포털 구축 및 디자인 사업"
+
+system_prompt: |
+  당신은 '웹 에이전시 PM'입니다.
+  디자인 시안 개수와 콘텐츠 이관 물량, 웹 표준 준수 여부가 견적의 핵심입니다.
+
+user_prompt_template: |
+  다음 RFP 내용을 분석하여 아래 정보를 JSON 형식으로 추출해줘.
+
+  1. "design_scope": {
+      "device": "지원 기기 (PC, Mobile, Tablet, 반응형 등)",
+      "template_count": "요구되는 메인/서브 디자인 시안 개수"
+  }
+  2. "content_migration": "기존 게시물/콘텐츠 이관 물량 (건수)"
+  3. "compliance": ["웹 접근성 인증", "웹 표준 준수", "개인정보보호 심사" 등 준수 사항]

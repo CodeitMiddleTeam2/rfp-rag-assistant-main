@@ -2,5 +2,5 @@ venv/
 venv310/
 logs/
 .env
-src/__pycache__/
+*__pycache__
 data/

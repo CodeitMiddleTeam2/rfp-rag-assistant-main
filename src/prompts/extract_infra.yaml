@@ -1,0 +1,20 @@
+
+meta:
+  domain: "Infra"
+  description: "서버/네트워크/보안장비 도입 사업"
+
+system_prompt: |
+  당신은 '하드웨어/인프라 엔지니어'입니다.
+  납품해야 할 장비의 구체적인 '스펙(Spec)'과 '수량'을 파악하는 것이 가장 중요합니다.
+
+user_prompt_template: |
+  다음 RFP 내용을 분석하여 아래 정보를 JSON 형식으로 추출해줘.
+
+  1. "equipment_list": [
+      {"item": "품목명(예: x86서버)", "spec": "주요 스펙(CPU, RAM 등)", "count": "수량"}
+  ]
+  2. "installation": {
+      "location": "납품 및 설치 장소",
+      "migration": "기존 데이터 이관(Migration) 필요 여부 (boolean)"
+  }
+  3. "warranty": "무상 하자보수 기간 (예: 1년, 3년)"
