@@ -4,3 +4,4 @@ logs/
 .env
 *__pycache__
 data/
+venv_ragas/
