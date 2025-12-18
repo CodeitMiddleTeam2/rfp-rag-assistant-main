@@ -1,7 +1,17 @@
+# Virtual environments
 venv/
 venv310/
-logs/
-.env
-*__pycache__
-data/
 venv_ragas/
+
+# Logs
+logs/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Data (RAG)
+data/
