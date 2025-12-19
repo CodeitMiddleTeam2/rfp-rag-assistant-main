@@ -1,8 +1,8 @@
 from langchain_core.runnables import RunnableLambda
 from langchain_core.tracers.context import collect_runs
 
-from retrieval.dense import dense_search
-from retrieval.lexical import lexical_score
+from retrievers.dense import dense_search
+from retrievers.lexical import lexical_score
 from config.settings import DENSE_WEIGHT, LEX_WEIGHT
 
 
