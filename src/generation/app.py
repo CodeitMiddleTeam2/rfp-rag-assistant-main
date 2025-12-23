@@ -2,24 +2,17 @@ import streamlit as st
 import pandas as pd
 import os
 import sys
-from openai import OpenAI
 from dotenv import load_dotenv
 
 # [1. 환경 변수 로드]
 load_dotenv()
-API_KEY = os.getenv("OPENAI_API_KEY")
-
-if not API_KEY:
-    st.error("🚨 API Key가 없습니다. .env 파일을 확인해주세요!")
-    st.stop() # 키가 없으면 앱 실행 중단
-
-client = OpenAI(api_key=API_KEY)
 
 # [2. 경로 설정 및 모듈 임포트]
 current_file = os.path.abspath(__file__)
 generation_dir = os.path.dirname(current_file)
 src_dir = os.path.dirname(generation_dir)
 root_dir = os.path.dirname(src_dir)
+model_path = os.path.join(root_dir, "unsloth.Q4_K_M.gguf")
 
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
@@ -27,8 +20,8 @@ if root_dir not in sys.path:
 # 💡 안전한 임포트 관리
 try:
     from src.prompts.RAGPromptBuilder import RAGPromptBuilder
-    from get_llm_response import get_llm_response_safe
-    # print("✅ 모든 모듈 임포트 성공!") # 디버깅용
+    from src.generation.model_manager import ModelManager
+    from src.generation.supabase_manager import SupabaseManager
 except ImportError as e:
     st.error(f"❌ 모듈 임포트 실패: {e}")
     st.stop()
@@ -39,7 +32,7 @@ def load_hierarchical_data():
     if os.path.exists(csv_path):
         return pd.read_csv(csv_path)
     else:
-        st.error("🚨 계층 데이터 파일이 없습니다. 먼저 데이터 보정 스크립트를 실행하세요.")
+        st.error("🚨 계층 데이터 파일이 없습니다.")
         return None
 
 def main():
@@ -47,65 +40,108 @@ def main():
     df = load_hierarchical_data()
     if df is None: return
 
-    # 프롬프트 빌더 초기화
-    prompt_dir = os.path.join(root_dir, 'src', 'prompts')
-    builder = RAGPromptBuilder(prompt_dir)
+    # ✅ [객체 생성] ModelManager 인스턴스화
+    # 인스턴스는 매 실행마다 새로 생성되지만, 내부에서 호출하는
+    # _load_llama_cpp_model 함수가 캐싱되어 있어 모델은 1번만 로드됩니다.
+    model_manager = ModelManager(local_model_path=model_path)
+    db_manager = SupabaseManager()
+
+    try:
+        prompt_dir = os.path.join(root_dir, 'src', 'prompts')
+        builder = RAGPromptBuilder(prompt_dir)
+    except:
+        st.warning("⚠️ RAGPromptBuilder를 찾을 수 없어 중지합니다.")
+        builder = None
 
     st.title("🏢 B2G 입찰 분석 플랫폼: 계층형 탐색 모드")
     st.markdown("카테고리별로 사업을 탐색하고, **여러 사업을 동시에 비교/분석**할 수 있습니다.")
 
-    # [3. 사이드바: 계층형 필터링]
+    # ---------------------------------------------------------
+    # [Sidebar] 설정 및 필터
+    # ---------------------------------------------------------
     with st.sidebar:
-        st.header("📂 카테고리 필터")
+        st.header("⚙️ 모델 설정")
+        model_source = st.radio("사용 모델", ("OpenAI API (GPT-5-mini)", "Local Model (Qwen-3-8B)"), index=0)
         
-        # Depth 1: 대분류
-        d1_list = sorted(df['Depth_1'].unique())
-        selected_d1 = st.selectbox("1단계: 대분류 선택", d1_list)
-        
-        # Depth 2: 중분류 (Depth 1에 종속)
-        d2_list = sorted(df[df['Depth_1'] == selected_d1]['Depth_2'].unique())
-        selected_d2 = st.selectbox("2단계: 중분류 선택", d2_list)
-        
-        # 프로젝트 선택 (전체 선택 옵션 추가로 '여러 문서 종합' 대응)
-        projects_in_cat = df[(df['Depth_1'] == selected_d1) & (df['Depth_2'] == selected_d2)]
-        project_list = ["🎁 해당 카테고리 전체 분석 (종합 모드)"] + sorted(projects_in_cat['사업명'].tolist())
-        selected_project = st.selectbox("3단계: 상세 사업 선택", project_list)
+        openai_client = None
+        local_llm = None
+
+        if "OpenAI" in model_source:
+            source_key = "openai"
+            # ✅ API Key 검증을 여기서 수행 (로컬 유저는 통과 가능)
+            if not os.getenv("OPENAI_API_KEY"):
+                st.error("🚨 .env 파일에 OPENAI_API_KEY가 없습니다.")
+            else:
+                openai_client = model_manager.get_openai_client()
+                st.success("🟢 API Ready")
+        else:
+            source_key = "local"
+            with st.spinner("🚀 로컬 모델 로딩 중..."):
+                # ✅ 매니저를 통해 모델 로드 (내부적으로 캐싱됨)
+                local_llm = model_manager.load_local_model()
+            if local_llm: 
+                st.success("🟢 Local Model Ready")
+            else:
+                st.error(f"❌ 모델 로드 실패. 경로 확인: {model_path}")
 
         st.divider()
-        st.caption(f"📍 현재 위치: {selected_d1} > {selected_d2}")
 
-    # [4. 컨텍스트 조립 로직 (성능 평가 2번 핵심)]
-    if "전체 분석" in selected_project:
-        # 여러 문서를 합치는 경우
-        target_rows = projects_in_cat
-        is_multi = True
-        # 각 문서의 앞부분 1500자씩 발췌하여 결합 (토큰 관리)
-        combined_context = ""
-        for _, row in target_rows.iterrows():
-            combined_context += f"### 사업명: {row['사업명']}\n{row['텍스트'][:1500]}\n\n"
-        display_title = f"{selected_d2} 카테고리 전체 요약 분석"
-    else:
-        # 단일 문서인 경우
-        target_row = df[df['사업명'] == selected_project].iloc[0]
-        is_multi = False
-        combined_context = target_row['텍스트']
-        display_title = selected_project
+        st.header("📂 탐색 필터")
 
-    # [5. 메인 레이아웃]
-    col_info, col_chat = st.columns([1, 1.2])
+        # --- Depth 1: 대분류 ---
+        d1_options = ["🔍 전체 데이터 (All RFPs)"] + sorted(df['Depth_1'].unique().tolist())
+        selected_d1 = st.selectbox("1단계: 대분류", d1_options)
+
+        target_rows = pd.DataFrame() # 분석 대상 데이터
+        display_title = ""
+
+        if selected_d1 == "🔍 전체 데이터 (All RFPs)":
+            # 전체 모드: 하위 옵션 비활성화
+            target_rows = df
+            display_title = "전체 RFP 데이터 종합 분석"
+            st.info("⚠️ 전체 문서는 양이 많아 분석이 느릴 수 있습니다.")
+            selected_d2 = None
+            selected_project = None
+        else:
+            # --- Depth 2: 중분류 ---
+            d2_options = ["📂 해당 대분류 전체 종합"] + sorted(df[df['Depth_1'] == selected_d1]['Depth_2'].unique().tolist())
+            selected_d2 = st.selectbox("2단계: 중분류", d2_options)
+
+            if selected_d2 == "📂 해당 대분류 전체 종합":
+                target_rows = df[df['Depth_1'] == selected_d1]
+                display_title = f"[{selected_d1}] 카테고리 전체 분석"
+                selected_project = None
+            else:
+                # --- Depth 3: 프로젝트 ---
+                projects_in_cat = df[(df['Depth_1'] == selected_d1) & (df['Depth_2'] == selected_d2)]
+                proj_options = ["🎁 해당 중분류 전체 종합"] + sorted(projects_in_cat['사업명'].tolist())
+                selected_project = st.selectbox("3단계: 상세 사업", proj_options)
+
+                if selected_project == "🎁 해당 중분류 전체 종합":
+                    target_rows = projects_in_cat
+                    display_title = f"[{selected_d2}] 하위 사업 전체 분석"
+                else:
+                    target_rows = df[df['사업명'] == selected_project]
+                    display_title = selected_project
+
+    # ---------------------------------------------------------
+    # [Main] 컨텍스트 조립 및 UI
+    # ---------------------------------------------------------
+    
+    filter_metadata = {}
+    if selected_d1 != "🔍 전체 데이터 (All RFPs)":
+        filter_metadata['depth_1'] = selected_d1
+    if selected_d2 and selected_d2 != "📂 해당 대분류 전체 종합":
+        filter_metadata['depth_2'] = selected_d2
+    if selected_project and selected_project != "🎁 해당 중분류 전체 종합":
+        filter_metadata['project_name'] = selected_project
+
+    # [UI 레이아웃]
+    col_info, col_chat = st.columns([1, 1.5])
 
     with col_info:
         st.subheader(f"📊 {display_title}")
-        if is_multi:
-            st.warning(f"💡 현재 {len(target_rows)}개의 사업 내용을 종합하여 답변합니다.")
-            st.write("**분석 대상 사업 리스트:**")
-            for p_name in target_rows['사업명']:
-                st.write(f"- {p_name}")
-        else:
-            # 단일 사업 정보 표시
-            st.info(f"💰 예산: {target_row['사업 금액']} / 📅 마감: {target_row['입찰 참여 마감일']}")
-            with st.expander("📄 원본 텍스트 보기"):
-                st.write(combined_context)
+        st.caption(f"참조 문서: {len(target_rows)}건")
 
     with col_chat:
         st.subheader("💬 AI 컨설턴트 질의응답")
@@ -124,34 +160,57 @@ def main():
             with st.chat_message("user"):
                 st.markdown(query)
 
+            # 답변 생성
             with st.chat_message("assistant"):
-                status = st.status("🧠 데이터를 종합 분석 중입니다..." if is_multi else "🔍 RFP 분석 중...")
-                
+                message_placeholder = st.empty()
+                message_placeholder.markdown("⏳ DB에서 관련 문서를 찾는 중...")
+
                 try:
-                    # [핵심] 프롬프트 빌더 호출
-                    # 다중 문서일 때는 'IT_정보화' 카테고리의 기본 페르소나를 사용하도록 설정
-                    final_messages = builder.build_messages(
-                        category=selected_d1,
-                        title=selected_project,
-                        context=combined_context,
-                        history=st.session_state.messages[:-1],
-                        query=query
+                    # ✅ 1. Supabase 벡터 검색 (RAG 핵심)
+                    # 필터링 조건에 맞는 문서 중, 질문과 관련된 Top 5 청크만 가져옴
+                    retrieved_docs = db_manager.similarity_search(
+                        query=query, 
+                        filters=filter_metadata, # 이 필터는 RPC 함수 구현에 따라 적용 방식이 다름
+                        top_k=5
                     )
-
-                    with st.expander("🛠️ Debug: 조립된 컨텍스트 확인"):
-                        st.write(f"컨텍스트 길이: {len(combined_context)}자")
-                        st.json(final_messages)
-
-                    # LLM 호출
-                    answer = get_llm_response_safe(final_messages, client=client)
                     
-                    status.update(label="✅ 분석 완료!", state="complete", expanded=False)
-                    st.markdown(answer)
-                    st.session_state.messages.append({"role": "assistant", "content": answer})
+                    if not retrieved_docs:
+                        combined_context = "관련된 정보를 데이터베이스에서 찾을 수 없습니다."
+                    else:
+                        combined_context = db_manager.format_docs(retrieved_docs)
+                        # 디버깅: 검색된 청크 보여주기 (선택사항)
+                        with st.expander("🔍 검색된 RAG 컨텍스트 확인"):
+                            st.write(combined_context)
+
+                    # ✅ 2. 프롬프트 조립
+                    if builder:
+                        final_messages = builder.build_messages(
+                            category=selected_d1 if selected_d1 else "General",
+                            title=display_title,
+                            context=combined_context, # 여기가 이제 전체 텍스트가 아니라 검색된 텍스트임
+                            history=st.session_state.messages[:-1],
+                            query=query
+                        )
+                    else:
+                        # Fallback
+                        final_messages = [
+                            {"role": "system", "content": "당신은 입찰 전문가입니다."},
+                            {"role": "user", "content": f"참고문서:\n{combined_context}\n\n질문: {query}"}
+                        ]
+
+                    # ✅ 3. 답변 생성 (기존 로직 동일)
+                    response_text = model_manager.generate_response(
+                        messages=final_messages,
+                        source=source_key,
+                        local_llm=local_llm,
+                        openai_client=openai_client
+                    )
                     
+                    message_placeholder.markdown(response_text)
+                    st.session_state.messages.append({"role": "assistant", "content": response_text})
+
                 except Exception as e:
-                    status.update(label="❌ 오류 발생", state="error")
-                    st.error(f"오류 내용: {str(e)}")
+                    message_placeholder.error(f"❌ 에러 발생: {str(e)}")
 
 if __name__ == "__main__":
     main()

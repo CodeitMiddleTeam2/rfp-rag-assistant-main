@@ -11,8 +11,15 @@ class RAGPromptBuilder:
         self.prompt_dir = os.path.dirname(os.path.abspath(__file__))
         self.core_path = os.path.join(prompt_dir, 'rag_chat_core.yaml')
         
-        with open(self.core_path, 'r', encoding='utf-8') as f:
-            self.core = yaml.safe_load(f)
+        if os.path.exists(self.core_path):
+            with open(self.core_path, 'r', encoding='utf-8') as f:
+                self.core = yaml.safe_load(f)
+        else:
+            # 기본 템플릿 하드코딩 (파일 없을 때 오류 방지)
+            self.core = {
+                'system_prompt_template': "당신은 {domain} 전문가입니다. {role}로서 답변하세요.",
+                'user_prompt_template': "### 참고 문서\n{context}\n\n### 질문\n{query}"
+            }
 
     def _determine_yaml(self, llm_category, title):
         """
@@ -65,6 +72,10 @@ class RAGPromptBuilder:
         """
         [작성 의도] app.py로부터 데이터를 받아 LLM에 전송할 최종 메시지 리스트를 조립합니다.
         [인자] category, title, context, history, query (app.py의 키워드와 1:1 매칭)
+        [개선된 구조]
+        1. 시스템 프롬프트 (페르소나 + 절대 규칙)
+        2. 대화 내역 (User <-> Assistant 티키타카)
+        3. 현재 턴 (문서 컨텍스트 + 사용자 질문)
         """
         # 1. 적절한 도메인 YAML 파일 선택
         target_file = self._determine_yaml(category, title)
@@ -78,17 +89,21 @@ class RAGPromptBuilder:
             role=role
         )
         
-        # 4. 대화 내역 포맷팅 (최근 5턴 유지)
-        history_str = "\n".join([f"{m['role']}: {m['content']}" for m in history[-5:]]) if history else "없음"
+        # 최종 메세지 리스트 구성
+        messages = [{"role": "system", "content": system_msg}]
+
+        # 대화 내역 주입 (String이 아닌 실제 Message Object로 추가)
+        if history:
+            # 최근 3턴(6개 메시지)만 유지하여 컨텍스트 낭비 방지
+            messages.extend(history[-6:])
         
-        # 5. 사용자 프롬프트 조립 (원본 텍스트가 길 경우를 대비해 4000자로 슬라이싱)
-        user_msg = self.core['user_prompt_template'].format(
-            context=str(context)[:4000], 
-            history=history_str,
+        # 사용자 메시지 조립 (문서 + 질문)
+        user_content = self.core['user_prompt_template'].format(
+            context=str(context)[:30000],
+            history="",
             query=query
         )
 
-        return [
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": user_msg}
-        ]
+        messages.append({"role": "user", "content": user_content})
+
+        return messages

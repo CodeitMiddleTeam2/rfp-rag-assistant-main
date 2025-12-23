@@ -17,8 +17,7 @@ system_prompt_template: |
 
 # 2. 사용자 프롬프트 (실제 데이터 주입)
 user_prompt_template: |
-  [대화 내역]
-  {history}
+  아래 [참고 문서]를 정독하고, 이를 바탕으로 [사용자 질문]에 답하십시오.
 
   [참고 문서 (RFP Context)]
   {context}
@@ -27,4 +26,4 @@ user_prompt_template: |
   {query}
 
   ---
-  위 [참고 문서]를 바탕으로 [사용자 질문]에 대해 답변을 작성해주세요.
+  답변 시, 문서를 근거로 논리적으로 설명하고 문서에 없는 내용은 추측하지 마십시오.
