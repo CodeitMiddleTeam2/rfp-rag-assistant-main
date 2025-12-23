@@ -12,7 +12,7 @@
 - bm25          : 키워드(BM25) 검색만
 - hybrid_rrf    : BM25 + Dense를 RRF(EnsembleRetriever)로 결합
 """
-RETRIEVER_KEY = "hybrid_rrf"
+RETRIEVER_KEY = "dense"
 
 # 검색 단계에서 뽑아오는 문서 수
 TOP_K = 8
@@ -32,11 +32,15 @@ HYBRID_WEIGHTS = [0.5,0.5]
 - none              : 없음
 - bge_rerank_m3     : BAAI/bge-reranker-v2-m3 (멀티링구얼)
 - bge_rerank_m3_ko  : 한국어 최적화 커뮤니티 버전(있으면)
+- ko_reranker
+- jina_reranker_v2
 """
 RERANKER_KEY = "bge_rerank_m3"
 
 # rerank 후 최종으로 남길 문서 수(보통 TOP_K보다 작게)
 RERANK_TOP_N = 5
+# rerank할 후보 문서 수 (TOP_K보다 크게 잡는 게 보통)
+RERANK_CANDIDATE_K = 30
 
 # 백엔드 선택 키
 RETRIEVAL_BACKEND = "local"     # supabase

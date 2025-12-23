@@ -43,8 +43,14 @@ REGISTRY: Dict[str, EmbeddingSpec] = {
         kwargs={}
     ),
     # OpenAI
-    "open_3_small": EmbeddingSpec(
+    "openai_3_small": EmbeddingSpec(
         key="openai_3_small",
+        provider="openai",
+        model_name="text-embedding-3-small",
+        kwargs={}
+    ),
+    "openai_3_large": EmbeddingSpec(
+        key="openai_3_large",
         provider="openai",
         model_name="text-embedding-3-large",
         kwargs={}
