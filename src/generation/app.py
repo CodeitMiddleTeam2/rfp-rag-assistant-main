@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 # 작성이력: 2025.12.19 한상준 최초 작성
 #          12.21 수정 : 한상준 대분류 종합모드 추가
 #          12.23 수정 : 한상준 DB 연동 코드 추가
+#          12.24 수정 : 한상준 rerank 추가
 #===============================================
 
 # [1. 환경 변수 로드]
@@ -175,21 +176,28 @@ def main():
                 message_placeholder.markdown("⏳ DB에서 관련 문서를 찾는 중...")
 
                 try:
-                    # ✅ 1. Supabase 벡터 검색 (RAG 핵심)
-                    # 필터링 조건에 맞는 문서 중, 질문과 관련된 Top 5 청크만 가져옴
-                    retrieved_docs = db_manager.similarity_search(
+                    # ✅ Supabase 벡터 검색 (RAG 핵심)
+                    # ✅ Rerank 기능이 포함된 검색 호출
+                    # initial_top_k=20: 후보를 넉넉히 가져옴
+                    # final_top_k=3: 최종적으로 3개만 LLM에 전달 (청크가 크므로 소수로 제한)
+                    retrieved_docs = db_manager.search_and_rerank(
                         query=query, 
-                        filters=filter_metadata, # 이 필터는 RPC 함수 구현에 따라 적용 방식이 다름
-                        top_k=5
+                        filters=filter_metadata,
+                        initial_top_k=20, 
+                        final_top_k=3
                     )
                     
                     if not retrieved_docs:
-                        combined_context = "관련된 정보를 데이터베이스에서 찾을 수 없습니다."
+                        combined_context = "검색 결과가 없습니다."
                     else:
                         combined_context = db_manager.format_docs(retrieved_docs)
-                        # 디버깅: 검색된 청크 보여주기 (선택사항)
-                        with st.expander("🔍 검색된 RAG 컨텍스트 확인"):
-                            st.write(combined_context)
+                        
+                        # (디버깅용) 검색된 문서 확인 Expandable UI
+                        with st.expander(f"🔍 Rerank 완료! 상위 {len(retrieved_docs)}개 문서 확인"):
+                            for idx, doc in enumerate(retrieved_docs):
+                                # 내용이 너무 기니까 앞부분만 살짝 보여주기
+                                preview = doc.get('content', '')[:200]
+                                st.markdown(f"**{idx+1}. {doc.get('사업명', '문서')}**\n> {preview}...")
 
                     # ✅ 2. 프롬프트 조립
                     if builder:
