@@ -3,6 +3,13 @@ import streamlit as st
 from supabase import create_client, Client
 from openai import OpenAI
 
+#==============================================
+# 프로그램명: supabase_manager.py
+# 폴더위치: src/generation/supabase_manager.py
+# 프로그램 설명: supabase DB 를 웹 데모에 연동하기 위한 클래스
+# 작성이력: 25.12.23 한상준 최초 작성
+#===============================================
+
 class SupabaseManager:
     def __init__(self):
         self.url = os.getenv("SUPABASE_URL")

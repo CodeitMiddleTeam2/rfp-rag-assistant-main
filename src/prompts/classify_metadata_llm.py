@@ -4,6 +4,13 @@ import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
+#==============================================
+# 프로그램명: classify_metadata_llm.py
+# 폴더위치: src/prompts/classify_metadata_llm.py
+# 프로그램 설명: LLM에게 메타데이터 csv 파일을 읽게 하고, 각 사업을 분류하는 프로그램
+# 작성이력: 25.12.17 한상준 최초 작성
+#===============================================
+
 # 1. 데이터 로드
 df = pd.read_csv('./metadata_added_category.csv')
 

@@ -2,6 +2,13 @@ import os
 from llama_cpp import Llama
 import time
 
+#==============================================
+# 프로그램명: test_local_model.py
+# 폴더위치: src/generation/test_local_model.py
+# 프로그램 설명: 학습된 로컬 모델을 실험해보기 위한 파일
+# 작성이력: 25.12.23 한상준 최초 작성
+#===============================================
+
 # 1. 모델 경로 설정 (정확한지 확인!)
 # 같은 폴더에 모델이 있다고 가정합니다. 다르다면 절대 경로를 입력하세요.
 MODEL_PATH = r"/home/spai0525/rfp-rag-assistant-main/unsloth.Q4_K_M.gguf"

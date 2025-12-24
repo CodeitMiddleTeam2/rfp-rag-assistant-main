@@ -1,6 +1,13 @@
 import json
 import os
 
+#==============================================
+# 프로그램명: merge_and_convert.py
+# 폴더위치: src/post_train/merge_and_convert.py
+# 프로그램 설명: 학습 데이터셋들을 모아서 병합하고 학습 규격으로 변환하는 프로그램
+# 작성이력: 25.12.22 한상준 최초 작성
+#===============================================
+
 # 작성 의도: 흩어져 있는 증강 데이터들을 하나로 통합하고 학습 규격(JSONL)으로 변환합니다.
 def merge_to_jsonl(file_list, output_filename):
     total_samples = 0

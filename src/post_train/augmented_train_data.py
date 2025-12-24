@@ -4,6 +4,13 @@ import sys
 from openai import OpenAI
 from dotenv import load_dotenv
 
+#==============================================
+# 프로그램명: augmented_train_data.py
+# 폴더위치: src/post_train/augmented_train_data.py
+# 프로그램 설명: 원본 질문-답 데이터를 증강시켜 학습 데이터셋을 생성하는 파일
+# 작성이력: 25.12.22 한상준 최초 작성
+#===============================================
+
 # [환경 변수 로드]
 load_dotenv()
 API_KEY = os.getenv("OPENAI_API_KEY")

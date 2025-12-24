@@ -4,6 +4,13 @@ from datasets import load_dataset
 from trl import SFTTrainer
 from transformers import TrainingArguments
 
+#==============================================
+# 프로그램명: train_rfp.py
+# 폴더위치: src/post_train/train_rfp.py
+# 프로그램 설명: unsloth 허브에서 base 모델을 로드하여 사전 학습 시키는 프로그램
+# 작성이력: 25.12.22 한상준 최초 작성
+#===============================================
+
 model_name = "unsloth/Qwen3-8B" 
 
 model, tokenizer = FastLanguageModel.from_pretrained(

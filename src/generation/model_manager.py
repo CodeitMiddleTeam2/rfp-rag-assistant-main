@@ -2,6 +2,13 @@ import os
 import streamlit as st
 from openai import OpenAI
 
+#==============================================
+# 프로그램명: model_manager.py
+# 폴더위치: src/generation/model_manager.py
+# 프로그램 설명: 웹 데모에서 모델을 선택하게끔(로컬 or API) 만들어주는 매니저 클래스
+# 작성이력: 25.12.23 한상준 최초 작성
+#===============================================
+
 # 캐싱할 함수는 클래스 밖(또는 staticmethod)에 정의합니다.
 @st.cache_resource
 def _load_llama_cpp_model(model_path: str, n_ctx: int = 24576):

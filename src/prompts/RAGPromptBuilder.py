@@ -1,6 +1,14 @@
 import os
 import yaml
 
+#==============================================
+# 프로그램명: RAGPromptBuilder.py
+# 폴더위치: src/prompts/RAGPromptBuilder.py
+# 프로그램 설명: 선택한 사업의 분류에 따라서 다른 상세 프롬프트를 배정하는 클래스
+# 작성이력: 25.12.17 한상준 최초 작성
+# 25.12.23 한상준 build_message 함수 수정 (history 부분 프롬프트 배치 변경)
+#===============================================
+
 class RAGPromptBuilder:
     def __init__(self, prompt_dir):
         """
