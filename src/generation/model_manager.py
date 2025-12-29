@@ -1,12 +1,18 @@
 import os
+import re
+import torch
+import gc
 import streamlit as st
 from openai import OpenAI
+from langsmith import traceable
 
 #==============================================
 # 프로그램명: model_manager.py
 # 폴더위치: src/generation/model_manager.py
 # 프로그램 설명: 웹 데모에서 모델을 선택하게끔(로컬 or API) 만들어주는 매니저 클래스
 # 작성이력: 25.12.23 한상준 최초 작성
+# 25.12.29 정규표현식 전처리 추가
+# 25.12.29 LangSmith 추적 추가
 #===============================================
 
 # 캐싱할 함수는 클래스 밖(또는 staticmethod)에 정의합니다.
@@ -53,6 +59,7 @@ class ModelManager:
         # 여기서 캐싱된 함수 호출 (_load_llama_cpp_model)
         return _load_llama_cpp_model(self.local_model_path)
 
+    @traceable(run_type="llm", name="LLM_Generation")
     def generate_response(self, messages, source="openai", local_llm=None, openai_client=None):
         """답변 생성 로직 통합"""
         try:
@@ -77,7 +84,21 @@ class ModelManager:
                     stop=["<|im_end|>", "<|endoftext|>", "User:"],
                     temperature=0.1
                 )
-                return response['choices'][0]['message']['content']
+                raw_content = response['choices'][0]['message']['content']
+
+                # ✅ [핵심 수정] <think> ... </think> 태그 제거 로직
+                # re.DOTALL: 줄바꿈이 포함된 내용도 모두 찾음
+                clean_content = re.sub(r'<think>.*?</think>', '', raw_content, flags=re.DOTALL).strip()
+                
+                return clean_content
                 
         except Exception as e:
             return f"❌ 답변 생성 중 에러 발생: {str(e)}"
+
+    def clear_gpu_memory(self):
+        """GPU 메모리 캐시를 강제로 비웁니다."""
+        if torch.cuda.is_available():
+            gc.collect()
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()
+            # print("🧹 GPU 메모리 캐시 초기화 완료")

@@ -1,11 +1,13 @@
 #==============================================
-# 프로그램명: embedding_model.py
+# 프로그램명: rerank_model.py
 # 폴더위치: ./src/rag/rerank/embedding_model.py
 # 프로그램 설명: 리랭크 모델 클래스
 # 작성이력: 2025.12.26 정예진 최초 작성
+# 25.12.29 한상준 LangSmith 추적 추가
 #==============================================
 from langchain_core.messages import HumanMessage
 from sentence_transformers import CrossEncoder
+from langsmith import traceable
 
 class RerankModel:
     def __init__(self, model_name:str):
@@ -15,7 +17,7 @@ class RerankModel:
         except OSError:
             raise Exception("[rerank_model.py] rerank 모델 이름이 존재하지 않습니다.")
 
-
+    @traceable(run_type="chain", name="BGE_Reranking")
     def rerank(self, query:str, retrieval_results:list[dict], top_k:int=0):
         if retrieval_results is None:
             raise Exception("[rerank_model.py] 벡터DB에서 유사도 검색한 결과가 존재하지 않습니다.")

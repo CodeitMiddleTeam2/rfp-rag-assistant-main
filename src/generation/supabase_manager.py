@@ -11,6 +11,7 @@ import numpy as np
 # 프로그램 설명: supabase DB 를 웹 데모에 연동하기 위한 클래스
 # 작성이력: 25.12.23 한상준 최초 작성
 # 25.12.24 rerank 추가
+# 25.12.29 supabase 검색 메서드 업데이트
 #===============================================
 RERANKER_MODEL_ID = "BAAI/bge-reranker-m3-ko"
 
@@ -49,25 +50,20 @@ class SupabaseManager:
         )
         return response.data[0].embedding
 
-    def search_and_rerank(self, query: str, filters: dict = None, initial_top_k: int = 15, final_top_k: int = 3):
-        """
-        [핵심 로직] Dense Search -> Reranking 파이프라인
-        1. Dense: 벡터 유사도로 넉넉하게 15개 정도 가져옵니다.
-        2. Rerank: 질문과 문서의 관계를 정밀 채점하여 상위 3개만 남깁니다.
-        """
+    def search_and_rerank(self, query: str, selected_project: str = "%", final_top_k: int = 3):
         try:
-            # --- 1단계: Dense Search (Supabase RPC) ---
+            # 1. 질문을 벡터로 변환
             query_vector = self.get_embedding(query)
             
+            # 2. match_rag_chunks 함수 호출 (필터 적용)
+            # [작성 의도] 사이드바에서 선택한 사업명을 filter_source에 매핑합니다.
             rpc_params = {
                 "query_embedding": query_vector,
-                "match_threshold": 0.3, # 1차 필터링 (너무 낮은건 제외)
-                "match_count": initial_top_k,
-                # "filter": filters # (DB RPC 함수가 필터를 지원하도록 구현되어 있어야 함)
+                "match_count": 25, # Rerank를 위해 넉넉히 가져옴
+                "filter_source": selected_project if selected_project else "%"
             }
             
-            # DB 호출 (함수명 'match_documents'는 데이터 팀 확인 필요)
-            response = self.supabase.rpc("match_documents", rpc_params).execute()
+            response = self.supabase.rpc("match_rag_chunks", rpc_params).execute()
             candidates = response.data
 
             if not candidates:
@@ -94,7 +90,7 @@ class SupabaseManager:
             return final_results
 
         except Exception as e:
-            st.error(f"❌ 검색/Rerank 실패: {e}")
+            st.error(f"❌ 검색 실패: {e}")
             return []
 
     def format_docs(self, docs):
