@@ -1,6 +1,6 @@
 #==================================================================
-# 프로그램명: evaluate_goldendataset_pjw.py
-# 폴더 위치    : src/evaluation/evaluate_goldendataset_pjw.py
+# 프로그램명: evaluate_goldendataset_smk.py
+# 폴더 위치    : src/evaluation/evaluate_goldendataset_smk.py
 # 프로그램 설명: golden dataset으로 키워드/백터 조회 결과 LLM질의를 한 결과, 질의/응답/context/ground truth를 josn으로 저장
 #             - input: src/dataset/goldendataset.json
 #             - output: src/dataset/ragas_inputs.json
@@ -92,13 +92,13 @@ prompt = ChatPromptTemplate.from_messages(
 # ==================================================
 VECTOR_RPC = os.getenv(
     "VECTOR_RPC",
-    "match_documents_chunks_structural_vector"
+    "match_documents_chunks_smk2_vector"
 )
 
 # 🔥 핵심 수정: n-gram OR BM25 함수
 BM25_RPC = os.getenv(
     "BM25_RPC",
-    "match_documents_chunks_structural_bm25_ngram"
+    "match_documents_chunks_smk2_bm25_ngram"
 )
 
 
@@ -254,9 +254,15 @@ def build_contexts(docs: List[Dict[str, Any]]) -> List[str]:
 
         contexts.append(
             f"""
-[문서 구조]
-- 상위 섹션: {metadata.get("parent_section", "정보 없음")}
-- 연관 섹션: {metadata.get("related_section", "정보 없음")}
+[공고 정보]
+- 공고 번호: {d.get("announcement_id")}
+- 공고 차수: {d.get("announcement_round")}
+- 공고명: {d.get("project_name")}
+- 사업 금액: {d.get("project_budget")}
+- 발주 기관: {d.get("ordering_agency")}
+- 공개 일자: {d.get("published_at")}
+
+
 
 [본문]
 {d.get("text")}
