@@ -222,7 +222,7 @@ def main():
                             reranked_result_obj = rerank_model.rerank(
                                 query, 
                                 retrieval_results, 
-                                top_k=3
+                                top_k=10
                             )
                             combined_context = reranked_result_obj.content
 
