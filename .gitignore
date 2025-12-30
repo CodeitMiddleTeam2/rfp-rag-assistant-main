@@ -2,6 +2,7 @@
 venv/
 venv310/
 venv_ragas/
+myenv/
 
 # Logs
 logs/
