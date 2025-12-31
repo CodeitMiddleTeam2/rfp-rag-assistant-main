@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import os
 import json
-from pathlib import Path
+from pathlib import Pathg
 
 # -----------------------------------
 # 1. 프로젝트 루트 기준으로 .env 로드
