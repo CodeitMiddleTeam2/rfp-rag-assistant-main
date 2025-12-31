@@ -23,7 +23,7 @@ import tiktoken
 from pathlib import Path
 from tqdm import tqdm
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[1] #상황에 따라 경로 수정 필요
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
@@ -32,7 +32,7 @@ SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
 TABLE_NAME = "documents_chunks_smk_3"
-CSV_PATH = BASE_DIR / "data" / "final_classification_hierarchy.csv"
+CSV_PATH = BASE_DIR / "src" / "dataset" / "chunks_all_pdfs_final_smk.json"
 
 CHUNKS_JSON_PATH = BASE_DIR / "data" / "chunks_all_pdfs_final.json"
 

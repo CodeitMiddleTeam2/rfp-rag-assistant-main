@@ -40,9 +40,9 @@ import fitz  # PyMuPDF
 # =============================
 # 설정
 # =============================
-CSV_PATH  = r"C:\Users\USER\Desktop\project_team2\data\final_classification_hierarchy.csv"
-FILES_DIR = r"C:\Users\USER\Desktop\project_team2\data\converted_pdfs"
-OUT_PATH  = r"C:\Users\USER\Desktop\project_team2\data\chunks_all_pdfs_final.json"
+CSV_PATH  = r"/home/spai0505/rfp-rag-assistant-main/final_classification_hierarchy.csv"
+FILES_DIR = r"C:\Users\USER\Desktop\project_team2\data\converted_pdfs"  # hwp_to_pdf_pjw로 만들어진 PDF 파일들만 따로 경로 필요
+OUT_PATH  = r"/home/spai0505/rfp-rag-assistant-main/src/dataset/chunks_all_pdfs_final_smk.json" # 최종 청크 결과 저장 경로
 
 TEXT_MAX_TOKENS = 1024
 TEXT_OVERLAP_LINES = 3
