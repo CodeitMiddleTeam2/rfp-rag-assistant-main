@@ -1,5 +1,5 @@
 #==================================================================
-# 프로그램명: upload_chunks_with_prev_context.py
+# 프로그램명: upload_chunks_final.py
 # 설명:
 # - 새로 생성한 chunks_all_pdfs_final.json 로드
 # - final_classification_hierarchy.csv에서 summary/category/depth 등 메타를 파일명 기준으로 매칭
@@ -8,8 +8,11 @@
 # - 파일명 매칭: trim + NBSP/BOM 제거 + basename + stem(strip) 매칭 + 보조키(공백/구분자 정규화) 매칭
 # - 텍스트 내 \u0000 같은 NUL 제거(Postgres text/JSON/embedding 입력 안전)
 # - timestamptz 입력 안전: "YYYY-MM-DD HH:MM:SS" -> ISO8601로 정규화
-# - embedding_input: 사업명 + 메타데이터(지정 항목) + (첫 청크만) 사업요약(CSV) + prev_context + 텍스트
-# - metadata.embedding_source: "project_name + metadata + (summary only first chunk) + prev_context + text"
+# - embedding_input: 사업명 + 메타데이터(지정 항목) + prev_context + 텍스트
+#   ✅ 단, summary 청크(content_type="summary")일 때만 [텍스트] 안에 라벨 1줄을 붙임:
+#      "[사업 요약]\n{요약텍스트}"
+# - metadata.embedding_source:
+#   "project_name + metadata + prev_context + text (summary chunk: text is labeled)"
 #==================================================================
 
 from supabase import create_client
@@ -23,7 +26,7 @@ import tiktoken
 from pathlib import Path
 from tqdm import tqdm
 
-BASE_DIR = Path(__file__).resolve().parents[1] #상황에 따라 경로 수정 필요
+BASE_DIR = Path(__file__).resolve().parents[1]
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
@@ -32,12 +35,11 @@ SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
 TABLE_NAME = "documents_chunks_smk_3"
-CSV_PATH = BASE_DIR / "src" / "dataset" / "chunks_all_pdfs_final_smk.json"
+CSV_PATH = BASE_DIR / "data" / "final_classification_hierarchy.csv"
 
 CHUNKS_JSON_PATH = BASE_DIR / "data" / "chunks_all_pdfs_final.json"
 
 PREV_CONTEXT_TOKENS = 300
-SUMMARY_MAX_CHARS = 1200
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
@@ -149,6 +151,7 @@ def build_csv_meta_map(csv_path: Path):
 
         row = g.iloc[0]
         meta = {
+            # summary는 매칭은 해두되, embedding_input에는 더 이상 쓰지 않음(요약은 별도 summary 청크의 text로 존재)
             "summary": to_text_or_none(row.get("사업 요약")),
             "category": to_text_or_none(row.get("Category")),
             "category_llm": to_text_or_none(row.get("Category_LLM")),
@@ -178,11 +181,14 @@ def find_csv_meta(source_file: str, stem_map: dict, loose_map: dict):
     return None
 
 # -----------------------------
-# build embedding input (project_name + metadata + (summary only first chunk) + prev_context + text)
-# - 메타데이터에는 depth/category/category_llm/summary를 넣지 않음
-# - 사업요약(summary)은 CSV에서만 가져오며, 각 파일의 첫 청크에만 포함
+# build embedding input
+# - 메타데이터에는 depth/category/category_llm/summary를 넣지 않음 (기존 규칙 유지)
+# - embedding_input 포맷은 모든 청크에서 동일:
+#   사업명 + 메타데이터 + (prev_context) + [텍스트]
+# - 단, summary 청크일 때만 [텍스트]에 라벨 1줄을 prepend:
+#   "[사업 요약]\n{요약텍스트}"
 # -----------------------------
-def build_embedding_input(chunk: dict, csv_meta: dict | None, prev_context: str, include_summary: bool) -> str:
+def build_embedding_input(chunk: dict, prev_context: str) -> str:
     # chunk 값(=요청한 항목들 중 chunk에서 오는 것)
     공고_번호 = strip_nul(str(chunk.get("announcement_id") or ""))
     공고_차수 = strip_nul(str(chunk.get("announcement_round") or ""))
@@ -196,12 +202,10 @@ def build_embedding_input(chunk: dict, csv_meta: dict | None, prev_context: str,
     파일명 = strip_nul(chunk.get("source_file") or "")
     텍스트 = strip_nul(chunk.get("text") or "")
 
-    # CSV에서 가져오는 항목들(요약만, 첫 청크에만)
-    사업_요약 = ""
-    if include_summary:
-        사업_요약 = strip_nul((csv_meta or {}).get("summary") or "")
-        if len(사업_요약) > SUMMARY_MAX_CHARS:
-            사업_요약 = 사업_요약[:SUMMARY_MAX_CHARS]
+    # ✅ summary 청크일 때만 [텍스트] 안에 라벨 1줄 추가
+    md = chunk.get("metadata") or {}
+    if md.get("content_type") == "summary":
+        텍스트 = "[사업 요약]\n" + 텍스트
 
     # ✅ metadata 블록(요약/카테고리/뎁스 제외)
     meta_lines = []
@@ -222,10 +226,6 @@ def build_embedding_input(chunk: dict, csv_meta: dict | None, prev_context: str,
 
     parts.append("[메타데이터]")
     parts.append("\n".join(meta_lines).strip())
-
-    if include_summary:
-        parts.append("[사업 요약]")
-        parts.append(사업_요약)
 
     if prev_context:
         parts.append("[이전문맥]")
@@ -261,7 +261,7 @@ def build_db_row(chunk: dict, csv_meta: dict | None, embedding: list[float]):
         "type": content_type,
         "category": category,
         "category_llm": category_llm,
-        "embedding_source": "project_name + metadata + (summary only first chunk) + prev_context + text",
+        "embedding_source": "project_name + metadata + prev_context + text (summary chunk: text is labeled)",
     }
 
     return {
@@ -304,15 +304,21 @@ def main():
 
     print("Chunks loaded:", len(chunks))
 
-    # prev_context는 파일 단위로 유지해야 하므로 (source_file, chunk_index) 기준 정렬
+    # ✅ 같은 파일 내에서 summary -> text -> table 순서로 고정 (prev_context 흐름 안정화)
     def key_fn(c):
         sf = c.get("source_file") or ""
-        ci = (c.get("metadata") or {}).get("chunk_index")
+        md = c.get("metadata") or {}
+        ct = md.get("content_type") or ""
+
+        type_rank = {"summary": 0, "text": 1, "table": 2}.get(ct, 9)
+
+        ci = md.get("chunk_index")
         try:
             ci = int(ci)
         except Exception:
             ci = 0
-        return (norm_basename(sf), ci)
+
+        return (norm_basename(sf), type_rank, ci)
 
     chunks = sorted(chunks, key=key_fn)
 
@@ -329,8 +335,7 @@ def main():
         cur_file = norm_basename(source_file)
 
         # 파일 바뀌면 prev_context 리셋
-        is_first_chunk_of_file = (prev_file != cur_file)
-        if is_first_chunk_of_file:
+        if prev_file != cur_file:
             prev_tail = ""
             prev_file = cur_file
 
@@ -342,9 +347,7 @@ def main():
 
         emb_input = build_embedding_input(
             chunk=chunk,
-            csv_meta=csv_meta,
-            prev_context=prev_context,
-            include_summary=is_first_chunk_of_file
+            prev_context=prev_context
         )
 
         try:

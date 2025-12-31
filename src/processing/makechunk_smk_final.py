@@ -1,5 +1,5 @@
 #==================================================================
-#프로그램명: upload_chunks_final.py
+#프로그램명: makechunk_smk_final.py
 #설명:
 
 #- final_classification_hierarchy.csv를 로드하여 파일명 stem 기준으로 PDF 메타데이터 매핑 생성
@@ -40,9 +40,9 @@ import fitz  # PyMuPDF
 # =============================
 # 설정
 # =============================
-CSV_PATH  = r"/home/spai0505/rfp-rag-assistant-main/final_classification_hierarchy.csv"
-FILES_DIR = r"C:\Users\USER\Desktop\project_team2\data\converted_pdfs"  # hwp_to_pdf_pjw로 만들어진 PDF 파일들만 따로 경로 필요
-OUT_PATH  = r"/home/spai0505/rfp-rag-assistant-main/src/dataset/chunks_all_pdfs_final_smk.json" # 최종 청크 결과 저장 경로
+CSV_PATH  = r"C:\Users\USER\Desktop\project_team2\data\final_classification_hierarchy.csv"
+FILES_DIR = r"C:\Users\USER\Desktop\project_team2\data\converted_pdfs"
+OUT_PATH  = r"C:\Users\USER\Desktop\project_team2\data\chunks_all_pdfs_final_final.json"
 
 TEXT_MAX_TOKENS = 1024
 TEXT_OVERLAP_LINES = 3
@@ -409,6 +409,21 @@ for idx, fn in enumerate(pdf_files, 1):
 
     # ✅ source_file은 "실제로 청킹한 변환 PDF 파일명"으로 저장
     base_meta["source_file"] = fn
+
+    # ✅ summary 전용 청크를 "각 문서 청크 제일 앞쪽"에 추가 (pages는 [])
+    summary_text = strip_controls(safe_str(base_meta.get("summary")).strip())
+    if summary_text:
+        records.append({
+            "chunk_id": str(uuid.uuid4()),
+            "pages": [],
+            **base_meta,
+            "text": summary_text,
+            "length": len(summary_text),
+            "metadata": {
+                "content_type": "summary",
+                "chunk_index": 0,
+            }
+        })
 
     table_pages, text_pages = extract_pdf_lines_separately(pdf_path)
 
