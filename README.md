@@ -68,6 +68,8 @@ rfp-rag-assistant-main/
 | src/dataset|openai_result.json|LLM openai모델 적용 결과 context & 답변|오민경|-|
 | src/dataset|qwen_result.json|LLM qwen모델 적용 결과 context & 답변|오민경|-|
 | src/dataset|ragas_input.json|LLM open모델 및 context수정 적용 결과 context & 답변|오민경|-|
+| src/evaluation|evaluate_goldendataset_XXX.py|goldendataset을 가지고 context/답변 생성 파이프라인|오민경|-|
+| src/evaluation|evaluate_ragas.py|evaluate_goldendataset_XXX.py수행결과 파일을 가지고 RAGASE평가수행|오민경|-|
 
 
 
