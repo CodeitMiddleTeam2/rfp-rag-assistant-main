@@ -46,7 +46,7 @@ rfp-rag-assistant-main/
 │    ├── 📂 vectorestore        # VectorDB 함수 정의(박지원, 서민경)
 │    ├── 📂 retrieval/          # RAG검색(한상준, 정예진)
 │    ├── 📂 generation/         # 답변생성(한상준, 정예진)
-
+│    └── 📂 Propmts             # prompt템플릿 및 분류항목 추출
 ├── .env                        # (비공개) API Key 환경 변수 등(개별)
 ├── requirements.txt            # 의존성 라이브러리 목록(공통)
 ├── requirements_jiwon.txt            # 의존성 라이브러리 목록(박지원-전처리 및 임베딩)
