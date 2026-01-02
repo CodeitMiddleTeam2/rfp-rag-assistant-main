@@ -56,6 +56,15 @@ rfp-rag-assistant-main/
 └── README.md                   # 프로젝트 문서(공통)
 
 ```
+
+## 협업일지 링크
+한상준
+박지원
+박지원 https://www.notion.so/2c602918343a80bdbc0ada371a76dca7
+서민경 
+정예진 https://www.notion.so/2a0fce412ebd8001be51dfdefe7fce90?v=2a0fce412ebd80ad9c11000cf704c795&source=copy_link
+오민경 https://www.notion.so/2c5208dedd488008a97bed963a21fc86
+
 ## 작성이력
 - 최  초 작성일: 2025.12.14
 - 마지막 수정일: 2026.01.02
