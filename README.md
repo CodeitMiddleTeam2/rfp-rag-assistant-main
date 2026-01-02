@@ -53,7 +53,8 @@ rfp-rag-assistant-main/
 ├── requirements.txt            # 의존성 라이브러리 목록(정예진-임베딩모델비교 및 retrieve)
 ├── requirements.txt            # 의존성 라이브러리 목록(한상준-모델양자화/파인튜닝, RAG-Chain)
 ├── requirements.txt            # 의존성 라이브러리 목록(오민경-goldendataset, RAGAS)
-└── README.md                   # 프로젝트 문서(오민경)
+└── README.md                   # 프로젝트 문서(공통)
 
 
-## Author: 한상준/코드잇 스프린트 AI 5기, Last Updated: 2025.12.14
+##최  초 작성일: 2025.12.14
+##마지막 수정일: 2026.01.02
