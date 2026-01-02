@@ -101,6 +101,9 @@ rfp-rag-assistant-main/
 - 정예진 https://www.notion.so/2a0fce412ebd8001be51dfdefe7fce90?v=2a0fce412ebd80ad9c11000cf704c795&source=copy_link
 - 오민경 https://www.notion.so/2c5208dedd488008a97bed963a21fc86
 
+## 보고서(발표자료) 링크
+https://docs.google.com/presentation/d/1ixtcjNGLBgVWb_ITibX9BmiCB6T6wk4J/edit?usp=sharing&ouid=115204610657523306253&rtpof=true&sd=true
+
 ## 작성이력
 - 최  초 작성일: 2025.12.14
 - 마지막 수정일: 2026.01.02
