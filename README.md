@@ -40,12 +40,12 @@ rfp-rag-assistant-main/
 │    └── main.py                
 │    └── 📂 dataset/            # RAGAS 평가를 위한 dataset저장
 │    ├── 📂 evaluation          # RAGAS 평가를 위한 질의응답 배치처리 및 평가
-│    ├── 📂 generation          # 답변생성
 │    ├── 📂 post_train          # 파인튜닝닝
 │    ├── 📂 processing          # 전처리 함수 정의(박지원, 서민경)
 │    ├── 📂 vectorestore        # VectorDB 함수 정의(박지원, 서민경)
-│    ├── 📂 retrieval/          # RAG검색(한상준, 정예진)
-│    ├── 📂 generation/         # 답변생성(한상준, 정예진)
+│    ├── 📂 retrieval/          # Vecotr DB검색
+│    ├── 📂 RAG                 # RAG Chain
+│    ├── 📂 generation          # 답변생성
 │    └── 📂 Propmts             # prompt템플릿 및 분류항목 추출
 ├── .env                        # (비공개) API Key 환경 변수 등(개별)
 ├── requirements.txt            # 의존성 라이브러리 목록(공통)
@@ -70,11 +70,6 @@ rfp-rag-assistant-main/
 | src/dataset|ragas_input.json|LLM open모델 및 context수정 적용 결과 context & 답변|오민경|-|
 | src/evaluation|evaluate_goldendataset_XXX.py|goldendataset을 가지고 context/답변 생성 파이프라인|오민경|-|
 | src/evaluation|evaluate_ragas.py|evaluate_goldendataset_XXX.py수행결과 파일을 가지고 RAGASE평가수행|오민경|-|
-| src/generation|app.py|RAG 기반 RFP 분석 플랫폼 (DB + Rerank + Local LLM)|한상준|-|
-| src/generation|load_local_model.py|학습된 로컬 모델을 불러오는 모듈 함수|한상준|-|
-| src/generation|model_manager.py|웹 데모에서 모델을 선택하게끔(로컬 or API) 만들어주는 매니저 클래스|한상준|-|
-| src/generation|supabase_manager.py|supabase DB 를 웹 데모에 연동하기 위한 클래스|한상준|-|
-| src/generation|test_local_model.py|학습된 로컬 모델을 실험해보기 위한 파일|한상준|-|
 | src/post_train|aumented_dataset.json|학습데이터 증강|한상준|-|
 | src/post_train|augmented_train_data.py|원본 질문-답 데이터를 증강시켜 학습 데이터셋을 생성하는 파일|한상준|-|
 | src/post_train|convert_gguf.py|사전학습 시킨 모델을 gguf 파일로 변환하는 프로그램|한상준|-|
@@ -86,6 +81,13 @@ rfp-rag-assistant-main/
 | src/processing|preprocess_pjw.py|전처리|박지원|-|
 | src/processing|upload_chunks_final|청크 supabase에 업로드||-|
 | src/processing|vision_process_pwj|vlm처리|박지원|-|
+| src/vectorstore|insert_chunk*.py|supabase에 저장|박지원/서민경|-|
+| src/generation|app.py|RAG 기반 RFP 분석 플랫폼 (DB + Rerank + Local LLM)|한상준|-|
+| src/generation|load_local_model.py|학습된 로컬 모델을 불러오는 모듈 함수|한상준|-|
+| src/generation|model_manager.py|웹 데모에서 모델을 선택하게끔(로컬 or API) 만들어주는 매니저 클래스|한상준|-|
+| src/generation|supabase_manager.py|supabase DB 를 웹 데모에 연동하기 위한 클래스|한상준|-|
+| src/generation|test_local_model.py|학습된 로컬 모델을 실험해보기 위한 파일|한상준|-|
+
 
 
 
