@@ -70,6 +70,11 @@ rfp-rag-assistant-main/
 | src/dataset|ragas_input.json|LLM open모델 및 context수정 적용 결과 context & 답변|오민경|-|
 | src/evaluation|evaluate_goldendataset_XXX.py|goldendataset을 가지고 context/답변 생성 파이프라인|오민경|-|
 | src/evaluation|evaluate_ragas.py|evaluate_goldendataset_XXX.py수행결과 파일을 가지고 RAGASE평가수행|오민경|-|
+| src/generation|app.py|RAG 기반 RFP 분석 플랫폼 (DB + Rerank + Local LLM)|한상준|-|
+| src/generation|load_local_model.py|학습된 로컬 모델을 불러오는 모듈 함수|한상준|-|
+| src/generation|model_manager.py|웹 데모에서 모델을 선택하게끔(로컬 or API) 만들어주는 매니저 클래스|한상준|-|
+| src/generation|supabase_manager.py|supabase DB 를 웹 데모에 연동하기 위한 클래스|한상준|-|
+| src/generation|test_local_model.py|학습된 로컬 모델을 실험해보기 위한 파일|한상준|-|
 
 
 
