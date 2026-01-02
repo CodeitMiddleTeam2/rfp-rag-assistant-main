@@ -58,7 +58,7 @@ rfp-rag-assistant-main/
 ```
 
 ## 협업일지 링크
-- 한상준
+- 한상준 https://drive.google.com/file/d/1IXDBrduZ9yFhgFZW-hwiaJo4hvRx777c/view?usp=sharing
 - 박지원 https://www.notion.so/2c602918343a80bdbc0ada371a76dca7
 - 서민경 
 - 정예진 https://www.notion.so/2a0fce412ebd8001be51dfdefe7fce90?v=2a0fce412ebd80ad9c11000cf704c795&source=copy_link
