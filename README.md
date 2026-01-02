@@ -56,6 +56,10 @@ rfp-rag-assistant-main/
 └── README.md                   # 프로젝트 문서(공통)
 
 ```
+## 파일리스트
+|폴더|파일명|주요내용|담당|-|
+|-|-|-|비고|
+
 
 ## 협업일지 링크
 - 한상준 https://drive.google.com/file/d/1IXDBrduZ9yFhgFZW-hwiaJo4hvRx777c/view?usp=sharing
