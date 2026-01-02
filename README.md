@@ -19,15 +19,12 @@
 4. **답변 생성 (Generation):** 검색된 문맥(Context)을 바탕으로 LLM이 정확한 답변 생성.
 
 ## 🏗️ 기술 스택 (Tech Stack)
-
-- **Language:** Python 3.12+
-- **LLM Orchestration:** LangChain
-- **LLM Model:** OpenAI GPT-5 (예정)
-- **Vector DB:** ChromaDB (or FAISS)
-- **Embedding:** OpenAI Embeddings / HuggingFace (예정)
-- **Reranker:** BGE(예정)
-- **Data Processing:** Pandas, PyPDFLoader
-
+- 임베딩	text-embedding-3-small
+- 리랭킹	bge-reranker-v2-m3-ko
+- 질문/답변	gpt-5-nano, Qwen-3-8B
+- 답변/RAGAS 평가	gpt-4o-mini/gpt-4.1-mini
+- trace: LangSmith
+- 벡터DB: Supabase
 
 ## 📂 폴더 구조
 
