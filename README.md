@@ -59,7 +59,10 @@ rfp-rag-assistant-main/
 ## 파일리스트
 |폴더|파일명|주요내용|담당|비고|
 |-|-|-|-|-|
-| data|-|-|-|-|
+| data|local파일|개별로 hwp/pdf/전처리 결과 파일 저장|공통|사이즈가 큰 관계로 local에서 관리|
+| notebook|eda.ipynb|-|-|-|
+| notebook|ragas_result.ipynb|-|-|-|
+| notebook|supabase.ipynb|-|-|-|
 
 
 ## 협업일지 링크
