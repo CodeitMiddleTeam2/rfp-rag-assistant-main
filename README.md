@@ -60,8 +60,8 @@ rfp-rag-assistant-main/
 |폴더|파일명|주요내용|담당|비고|
 |-|-|-|-|-|
 | data|local파일|개별로 hwp/pdf/전처리 결과 파일 저장|공통|사이즈가 큰 관계로 local에서 관리|
-| notebook|eda.ipynb|-|-|-|
-| notebook|ragas_result.ipynb|-|-|-|
+| notebook|eda_example.ipynb|csv메타데이터 확인|오민경|-|
+| notebook|ragas_result.ipynb|rags결과 csv로 저장한 것을 확인 및 시각화|오민경|-|
 | notebook|supabase.ipynb|-|-|-|
 
 
