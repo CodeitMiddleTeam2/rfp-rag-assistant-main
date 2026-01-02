@@ -82,6 +82,11 @@ rfp-rag-assistant-main/
 | src/post_train|merge_and_convert.py|학습 데이터셋들을 모아서 병합하고 학습 규격으로 변환하는 프로그램|한상준|-|
 | src/post_train|train_rfp.py|unsloth 허브에서 base 모델을 로드하여 사전 학습 시키는 프로그램|한상준|-|
 | src/post_train|train_sft.sonl|sft를 위한 sonl파일|한상준|-|
+| src/processing|build_rag_pjw.py|json으로 파일 만들기|박지원|-|
+| src/processing|hwp_to_pdf_pjw|한글파일 pdf로 변환|박지원|-|
+| src/processing|preprocess_pjw.py|전처리|박지원|-|
+| src/processing|upload_chunks_final|청크 supabase에 업로드||-|
+| src/processing|vision_process_pwj|vlm처리|박지원|-|
 
 
 
