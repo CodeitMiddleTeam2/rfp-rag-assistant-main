@@ -82,6 +82,10 @@ rfp-rag-assistant-main/
 | src/processing|upload_chunks_final|청크 supabase에 업로드||-|
 | src/processing|vision_process_pwj|vlm처리|박지원|-|
 | src/vectorstore|insert_chunk*.py|supabase에 저장|박지원/서민경|-|
+| src/retieval|retrievers.py| Dense(Vector) 검색 + 한국어 Reranker 적용 |정예진|-|
+| src/retieval|retrieve_bm25_ngram_text.py| ngram방식 한국어 키워드 검색 테스트 |오민|-|
+| src/rag/embed|embedding_model.py|임베딩 모델 클래스/filter_source 인자 추가 및 전달, LangSmith 추적 추가|정예진/한상|-|
+| src/rag/rerank|db.py| supabase 기능 관련 클래스/query() : 임베딩된 사용자 쿼리를 받고, 유사도 계산|정예진/한상준|-|
 | src/generation|app.py|RAG 기반 RFP 분석 플랫폼 (DB + Rerank + Local LLM)|한상준|-|
 | src/generation|load_local_model.py|학습된 로컬 모델을 불러오는 모듈 함수|한상준|-|
 | src/generation|model_manager.py|웹 데모에서 모델을 선택하게끔(로컬 or API) 만들어주는 매니저 클래스|한상준|-|
