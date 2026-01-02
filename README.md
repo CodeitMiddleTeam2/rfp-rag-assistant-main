@@ -19,10 +19,10 @@
 4. **답변 생성 (Generation):** 검색된 문맥(Context)을 바탕으로 LLM이 정확한 답변 생성.
 
 ## 🏗️ 기술 스택 (Tech Stack)
-- 임베딩	text-embedding-3-small
-- 리랭킹	bge-reranker-v2-m3-ko
-- 질문/답변	gpt-5-nano, Qwen-3-8B
-- 답변/RAGAS 평가	gpt-4o-mini/gpt-4.1-mini
+- 임베딩:	text-embedding-3-small
+- 리랭킹:	bge-reranker-v2-m3-ko
+- 질문/답변:	gpt-5-nano, Qwen-3-8B
+- 답변/RAGAS 평가:	gpt-4o-mini/gpt-4.1-mini
 - trace: LangSmith
 - 벡터DB: Supabase
 
