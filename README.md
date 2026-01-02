@@ -64,6 +64,10 @@ rfp-rag-assistant-main/
 | notebook|ragas_result.ipynb|rags결과 csv로 저장한 것을 확인 및 시각화|오민경|-|
 | metadata|create_table.sql|supabase table 및 index 생성 스크립트|박지원/서민경|-|
 | metadata|create_function.sql|supbase vector 및 키워드 검색을 위한 function 생성 스크립트|오민경|-|
+| src/dataset|goldendataset.json|테스트용 질문/답변 set|오민경|-|
+| src/dataset|openai_result.json|LLM openai모델 적용 결과 context & 답변|오민경|-|
+| src/dataset|qwen_result.json|LLM qwen모델 적용 결과 context & 답변|오민경|-|
+| src/dataset|ragas_input.json|LLM open모델 및 context수정 적용 결과 context & 답변|오민경|-|
 
 
 
