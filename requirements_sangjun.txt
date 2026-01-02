@@ -1,0 +1,23 @@
+# [1] Web Interface & Demo
+streamlit==1.52.1
+python-dotenv==1.2.1
+
+# [2] AI Engine & Fine-tuning (On-premise)
+# Note: Unsloth는 torch 및 xformers와 긴밀하게 연결되어 있습니다.
+unsloth==2025.12.8
+torch==2.9.1
+transformers==4.57.3
+bitsandbytes==0.49.0
+accelerate==1.12.0
+xformers==0.0.33.post2
+
+# [3] RAG & Database (Supabase & OpenAI)
+supabase==2.27.0
+langchain==1.1.3
+langchain-openai==1.1.1
+langchain-community==0.4.1
+sentence-transformers==5.2.0  # Reranker(BGE-M3) 구동용
+
+# [4] Prompt Engineering & Monitoring
+PyYAML==6.0.3                # rag_chat_core.yaml 관리용
+langsmith==0.4.59            # LLM 가시성 확보 및 트래킹
