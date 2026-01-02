@@ -62,7 +62,9 @@ rfp-rag-assistant-main/
 | data|local파일|개별로 hwp/pdf/전처리 결과 파일 저장|공통|사이즈가 큰 관계로 local에서 관리|
 | notebook|eda_example.ipynb|csv메타데이터 확인|오민경|-|
 | notebook|ragas_result.ipynb|rags결과 csv로 저장한 것을 확인 및 시각화|오민경|-|
-| notebook|supabase.ipynb|-|-|-|
+| metadata|create_table.sql|supabase table 및 index 생성 스크립트|박지원/서민경|-|
+| metadata|create_function.sql|supbase vector 및 키워드 검색을 위한 function 생성 스크립트|오민경|-|
+
 
 
 ## 협업일지 링크
