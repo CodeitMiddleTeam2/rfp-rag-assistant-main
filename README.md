@@ -55,6 +55,6 @@ rfp-rag-assistant-main/
 ├── requirements_minkyungoh.txt            # 의존성 라이브러리 목록(오민경-goldendataset, RAGAS)
 └── README.md                   # 프로젝트 문서(공통)
 
-
+```
 ## 최  초 작성일: 2025.12.14
 ## 마지막 수정일: 2026.01.02
